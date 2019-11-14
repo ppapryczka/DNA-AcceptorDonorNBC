@@ -1,0 +1,19 @@
+
+# add one sign stats to both tables
+#for ( x in c("A", "G", "T", "C"))
+#{
+#  acceptors_table <- cbind(acceptors_table, matrix(str_count(acceptors_table[, 2], x)))
+#  donors_table <- cbind(donors_table, matrix(str_count(donors_table[, 2], x))))
+  
+  # this also div by length 
+  # acceptors_table <- cbind(acceptors_table, matrix(str_count(acceptors_table[, 2], x)/str_length(donors_table[1, 2])))
+  # donors_table <- cbind(donors_table, matrix(str_count(donors_table[, 2], x)/str_length(donors_table[1, 2])))
+#}
+
+
+# get all permutations of patterns 
+#prm <-  permutations(n = 5, r = 4,  c("A", "G", "T", "C", "-"))
+#prm
+#prm <- apply(prm, 1, function(x)paste0(x, collapse=''))
+#prm
+
