@@ -1,3 +1,5 @@
+# old file, now just notes, maybe use some of attributes  
+
 if (! "stringr" %in% row.names(installed.packages()))
   install.packages("stringr")
 
@@ -26,11 +28,15 @@ acceptors_table <- t(acceptors_table)
 donors_table <- matrix(donors_table[,"V1"], nrow = 2, ncol=length(donors_table[,"V1"])/2)
 donors_table <- t(donors_table)
 
+
 # get all permutations of A G T C nucleotides of specific length 
-for ( x in 1:4 )
+columns_ids = c()
+
+for ( x in 1:3 )
 {
-  prm <-permutations(n = 4, r = x,  c("A", "G", "T", "C"))
+  prm <-permutations(n = 4, r = x,  c("A", "G", "T", "C"), repeats.allowed = TRUE)
   prm <- apply(prm, 1, function(x)paste0(x, collapse=''))
+  columns_ids <- c(columns_ids, prm)
   
   # count occurances of each permutation in sequences
   for ( p in prm )
@@ -40,4 +46,29 @@ for ( x in 1:4 )
   }
 }
 
+for ( x in 1:3)
+{
+  prm <-permutations(n = 5, r = x,  c("A", "G", "T", "C", "."))
+  prm <- apply(prm, 1, function(x)paste0(x, collapse=''))
+  columns_ids <- c(columns_ids, prm)
+  
+  #count occurances of each permutation in sequences
+  for ( p in prm )
+  {
+    acceptors_table <- cbind(acceptors_table, matrix(length(unlist(str_extract_all(acceptors_table[, 2], p))))) 
+    donors_table <- cbind(donors_table, matrix(length(unlist(str_extract_all(donors_table[, 2], p)))))
+  }
+}
 
+for (x in acceptors_table[, 2])
+{
+  print(unlist(str_extract_all(x, ".")))
+  print("Length")
+  print(length(unlist(str_extract_all(x, ".."))))
+  print(str_count(x, "."))
+  print(str_count(x, ".."))
+}
+
+
+summary(acceptors_table)
+print(columns_ids)
