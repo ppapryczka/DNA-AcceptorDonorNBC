@@ -38,10 +38,17 @@ nucleotide_to_number <- function(nucleotide){
   }
   else if (nucleotide == "T"){
     return(4)
-  } else {
-    warning("Not valid nucleotide - 0 return as value")
-    return(0)
   }
+  else if (nucleotide == "N")  {
+    return(0)
+  } else {
+    warning("Not valid nucleotide -1 return as value.")
+    return(-1)
+  }
+}
+
+sequence_to_numbers <- function(sequence){
+  return (map_dbl(unlist(strsplit(sequence,""), use.names=FALSE), nucleotide_to_number))
 }
 
 # ---------------------------------------------------------------------------------------------
@@ -64,26 +71,22 @@ donors_table <- t(donors_table)
 # PRODUCE ATTRIBUTES
 # ---------------------------------------------------------------------------------------------
 
-# add number-position arguments to acceptors table
-result_rows = c() 
-for (x in acceptors_table[, 2])
-{
-  result_rows = rbind(result_rows, unlist(map(unlist(strsplit(x,""), use.names=FALSE), nucleotide_to_number), use.names=FALSE))
-}
-acceptors_table = cbind(acceptors_table, result_rows)
+# explonation of calling <- map_dbl <- sequence_to_numbers <- map <- do.call/rbind <- cbind
 
+# add number-position arguments to acceptors table
+acceptors_table <- cbind(acceptors_table, do.call(rbind, map(acceptors_table[, 2], sequence_to_numbers)))
 
 # add number-position arguments to donors table
-result_rows = c() 
-for (x in donors_table[, 2])
-{
-  result_rows = rbind(result_rows, unlist(map(unlist(strsplit(x,""), use.names=FALSE), nucleotide_to_number), use.names=FALSE))
-}
-donors_table = cbind(donors_table, result_rows)
+donors_table <- cbind(donors_table, do.call(rbind, map(donors_table[, 2], sequence_to_numbers)))
 
 # ---------------------------------------------------------------------------------------------
 # ANALYSIS AND MODEL
 # ---------------------------------------------------------------------------------------------
+
+summary(acceptors_table[acceptors_table[, 1]==1, , drop=FALSE])
+summary(acceptors_table[acceptors_table[, 1]==0, , drop=FALSE])
+
+summary(acceptors_table[acceptors_table[, 1]==0,, drop=FALSE][, c(1, 3)])
 
 # ---------------------------------------------------------------------------------------------
 # CLASSIFICATION
