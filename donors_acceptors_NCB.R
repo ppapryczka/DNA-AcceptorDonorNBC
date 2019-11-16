@@ -17,6 +17,12 @@ if (! "purrr" %in% row.names(installed.packages()))
   install.packages("purrr")
 library(purrr)
 
+# e1071 - naive bayes
+if (! "e1071" %in% row.names(installed.packages()))
+  install.packages("e1071")
+library(e1071)
+
+
 # ---------------------------------------------------------------------------------------------
 # CREATE FUNCTIONS AND DECLARE CONSTS
 # ---------------------------------------------------------------------------------------------
@@ -59,6 +65,7 @@ sequence_to_numbers <- function(sequence){
 donors_table <- read.table(default_donors)
 acceptors_table <- read.table(default_acceptors)
 
+
 # convert acceptors table
 acceptors_table <- matrix(acceptors_table[,"V1"], nrow = 2, ncol=length(acceptors_table[,"V1"])/2)
 acceptors_table <- t(acceptors_table)
@@ -83,14 +90,29 @@ donors_table <- cbind(donors_table, do.call(rbind, map(donors_table[, 2], sequen
 # ANALYSIS AND MODEL
 # ---------------------------------------------------------------------------------------------
 
-summary(acceptors_table[acceptors_table[, 1]==1, , drop=FALSE])
-summary(acceptors_table[acceptors_table[, 1]==0, , drop=FALSE])
+# convert both tables to dataframes and delete tables
+acceptors_dataframe = as.data.frame(acceptors_table)
+colnames(acceptors_dataframe)[c(1, 2)] <- c("Class", "Seq")
+remove(acceptors_table)
 
-summary(acceptors_table[acceptors_table[, 1]==0,, drop=FALSE][, c(1, 3)])
+donors_dataframe = as.data.frame(donors_table)
+colnames(donors_dataframe)[c(1, 2)] <- c("Class", "Seq")
+remove(donors_table)
+
+#summary(acceptors_table[acceptors_table[, 1]==1, , drop=FALSE])
+#summary(acceptors_table[acceptors_table[, 1]==0, , drop=FALSE])
+#summary(acceptors_table[acceptors_table[, 1]==0,, drop=FALSE][, c(1, 5)])
 
 # ---------------------------------------------------------------------------------------------
 # CLASSIFICATION
 # ---------------------------------------------------------------------------------------------
+
+model <- naiveBayes(Class ~ ., data = acceptors_dataframe)
+predict(model, acceptors_dataframe)
+predict(model, acceptors_dataframe, type = "raw")
+
+pred <- predict(model, acceptors_dataframe)
+table(pred, acceptors_dataframe$Class)
 
 # ---------------------------------------------------------------------------------------------
 # RESULTS
