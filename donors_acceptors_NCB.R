@@ -22,7 +22,6 @@ if (! "e1071" %in% row.names(installed.packages()))
   install.packages("e1071")
 library(e1071)
 
-
 # ---------------------------------------------------------------------------------------------
 # CREATE FUNCTIONS AND DECLARE CONSTS
 # ---------------------------------------------------------------------------------------------
@@ -86,33 +85,49 @@ acceptors_table <- cbind(acceptors_table, do.call(rbind, map(acceptors_table[, 2
 # add number-position arguments to donors table
 donors_table <- cbind(donors_table, do.call(rbind, map(donors_table[, 2], sequence_to_numbers)))
 
+# get rid of "seq" fields
+acceptors_table = cbind(acceptors_table[, 1], acceptors_table[, 3:ncol(acceptors_table)]) 
+donors_table = cbind(donors_table[,1 ], donors_table[, 3:ncol(donors_table)])
+
+
 # ---------------------------------------------------------------------------------------------
 # ANALYSIS AND MODEL
 # ---------------------------------------------------------------------------------------------
 
 # convert both tables to dataframes and delete tables
 acceptors_dataframe = as.data.frame(acceptors_table)
-colnames(acceptors_dataframe)[c(1, 2)] <- c("Class", "Seq")
+colnames(acceptors_dataframe)[1] <- c("Class")
 remove(acceptors_table)
 
 donors_dataframe = as.data.frame(donors_table)
-colnames(donors_dataframe)[c(1, 2)] <- c("Class", "Seq")
+colnames(donors_dataframe)[1] <- c("Class")
 remove(donors_table)
 
-#summary(acceptors_table[acceptors_table[, 1]==1, , drop=FALSE])
-#summary(acceptors_table[acceptors_table[, 1]==0, , drop=FALSE])
-#summary(acceptors_table[acceptors_table[, 1]==0,, drop=FALSE][, c(1, 5)])
+
+#summary(acceptors_dataframe[acceptors_dataframe[, 1]==1, ,drop=FALSE])
+#summary(acceptors_dataframe[acceptors_dataframe[, 1]==0, ,drop=FALSE])
+#summary(acceptors_dataframe[acceptors_dataframe[, 1]==0, ,drop=FALSE][, c(1, 5)])
 
 # ---------------------------------------------------------------------------------------------
 # CLASSIFICATION
 # ---------------------------------------------------------------------------------------------
 
-model <- naiveBayes(Class ~ ., data = acceptors_dataframe)
-predict(model, acceptors_dataframe)
-predict(model, acceptors_dataframe, type = "raw")
+#model <- naiveBayes(Class ~ ., data = acceptors_dataframe[, c(1:10),])
+#predict(model, acceptors_dataframe[,3: ncol(acceptors_dataframe)])
+#predict(model, acceptors_dataframe[,3: ncol(acceptors_dataframe)], type = "raw")
 
-pred <- predict(model, acceptors_dataframe)
+#pred <- predict(model, acceptors_dataframe)
+#table(pred, acceptors_dataframe$Class)
+
+
+x <- acceptors_dataframe[, c(2, 3, 4, 5), drop=FALSE]
+y <- acceptors_dataframe$Class
+y <- as.factor(y)
+model <- naiveBayes(x=x, y=y, laplace = 0)
+pred <- predict(model, acceptors_dataframe[,c(2,3,4,5), drop=FALSE])
+predict(model, acceptors_dataframe[,c(2,3,4,5), drop=FALSE], type = "raw")
 table(pred, acceptors_dataframe$Class)
+
 
 # ---------------------------------------------------------------------------------------------
 # RESULTS
