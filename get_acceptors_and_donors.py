@@ -11,6 +11,21 @@ DEFAULT_DONORS_RESULT_FILENAME = "donor.dat"
 DEFAULT_ACCEPTORS_RESULT_FILENAME = "acceptor.dat"
 
 
+def parser_check_if_file_exists(parser: argparse.ArgumentParser, file_path: str) -> str:
+    """
+    Check if file exists - if not call parser.error, else return ``file_path``
+    as a result.
+
+    Args:
+        parser: Command parser.
+        file_path: Path to file.
+    """
+    if os.path.isfile(file_path):
+        return file_path
+    else:
+        parser.error(f"The file {file_path} doesn't exist!")
+
+
 def get_acceptors_and_donors_command(command_args: List[str]) -> None:
     """
     Create parser, parse args given in ``command_args`` and run ``get_acceptors_and_donors``. 
@@ -69,21 +84,8 @@ def get_acceptors_and_donors_command(command_args: List[str]) -> None:
     # run get acceptors and donors
     get_acceptors_and_donors(args.A,  args.B,  args.input,  args.donors,  args.acceptors)
     
-    
-def parser_check_if_file_exists(parser: argparse.ArgumentParser, file_path: str) -> str:
-    """
-    Check if file exists - if not call parser.error, else return ``file_path``
-    as a result.
 
-    Args:
-        parser: Command parser.
-        file_path: Path to file.
-    """
-    if os.path.isfile(file_path):
-        return file_path
-    else:
-        parser.error(f"The file {file_path} doesn't exist!")
-    
+
 def get_acceptors_and_donors(A: int,  B: int,  input_file: str,  donors_output: str,  acceptors_output: str) -> None:
     """
     Read data from ``input_file``, get false and real donors and save them to``donors_output``, get false
@@ -121,7 +123,8 @@ def get_acceptors_and_donors(A: int,  B: int,  input_file: str,  donors_output: 
             acceptors_f.write(f"{0}\n{x}\n")
     
     print("We are on a mission from God!")
-    
+
+
 def dna_data_split(data_file: str ) -> List:
     """
     Open ``data_file``, read lines and take only 
