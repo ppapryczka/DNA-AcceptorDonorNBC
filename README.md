@@ -6,9 +6,10 @@ Opis projektu - [link](https://staff.elka.pw.edu.pl/~rbiedrzy/MOW/opisAraDNA.htm
 ## Python - środowisko
 Wymagania:
 - `python3.6`
-- `python3-venv` (`sudo apt install python3-venv`)
+- `python3.6-venv` (`sudo apt install python3.6-venv`)
 
 Tworzenie środowskia:
-1. `python3 -m venv venv` (tworzy środowisko `venv`)
+1. `python3.6 -m venv venv` (tworzy środowisko `venv`)
 2. `source venv/bin/activate` (aktywacja środowiska)
-3. `pip3 install -r requirements.txt` (instalacja bibliotek)
+3. `pip3 install --upgrade pip`
+4. `pip3 install -r requirements.txt` (instalacja bibliotek)

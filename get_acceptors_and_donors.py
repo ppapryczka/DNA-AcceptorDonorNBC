@@ -85,7 +85,6 @@ def get_acceptors_and_donors_command(command_args: List[str]) -> None:
     get_acceptors_and_donors(args.A,  args.B,  args.input,  args.donors,  args.acceptors)
     
 
-
 def get_acceptors_and_donors(A: int,  B: int,  input_file: str,  donors_output: str,  acceptors_output: str) -> None:
     """
     Read data from ``input_file``, get false and real donors and save them to``donors_output``, get false
@@ -159,6 +158,7 @@ def dna_data_split(data_file: str ) -> List:
     
     return dna_sequences
 
+
 def get_true_fragments(true_positions_list: List[int],  A: int,  B: int, sequence_data: str):
     """
     Get real donors/acceptors from given ``sequence_data`` described by ``true_fragments_positions``.
@@ -168,6 +168,7 @@ def get_true_fragments(true_positions_list: List[int],  A: int,  B: int, sequenc
         if not is_fragment_outside_of_sequence(A,  B,  x,  len(sequence_data)):
             true_fragments.append(sequence_data[x-A:x+B])
     return true_fragments
+
 
 def get_false_fragments(true_fragments_positions: int,  A: int,  B: int, sequence_data: str, fragment: str):
     """
@@ -180,6 +181,7 @@ def get_false_fragments(true_fragments_positions: int,  A: int,  B: int, sequenc
             if  is_good_false_fragment(true_fragments_positions,  A,  B,  false_fragment_pos,  len(sequence_data)):
                 false_fragments.append(sequence_data[false_fragment_pos-A:false_fragment_pos+B])
     return false_fragments
+
 
 def line_of_numbers_to_tuples(line: str) -> List[Tuple[int,  int]]:
     """
@@ -197,9 +199,10 @@ def line_of_numbers_to_tuples(line: str) -> List[Tuple[int,  int]]:
     
     return result
 
+
 def is_fragment_outside_of_sequence(A: int,  B: int,  pos: int,  seq_len: int) -> bool:
     """
-    Check if pos give a valid fragment which not go outside  sequence. 
+    Check if pos give a valid fragment which not go outside sequence.
     """
     if pos + B >= seq_len:
        return True
@@ -207,6 +210,7 @@ def is_fragment_outside_of_sequence(A: int,  B: int,  pos: int,  seq_len: int) -
        return True
        
     return False
+
 
 def is_good_false_fragment(true_positions_list: int,  A:int,  B: int, pos: int,  seq_len: int) -> bool:
     """
@@ -216,12 +220,13 @@ def is_good_false_fragment(true_positions_list: int,  A:int,  B: int, pos: int, 
     if  is_fragment_outside_of_sequence(A,  B,  pos,  seq_len):
         return False
     
-    if  have_coolision_with_true_fragment(true_positions_list,  A,  B,  pos):
+    if  have_collision_with_true_fragment(true_positions_list,  A,  B,  pos):
         return False
     
     return True
 
-def have_coolision_with_true_fragment(true_positions_list: int,  A:int,  B: int,  pos: int ) ->bool:
+
+def have_collision_with_true_fragment(true_positions_list: int,  A:int,  B: int,  pos: int ) -> bool:
     """
     Check if false fragment given by it ``position`` don't have overlapping with given 
     true fragments in ``introns_list``.
@@ -234,6 +239,7 @@ def have_coolision_with_true_fragment(true_positions_list: int,  A:int,  B: int,
             return True
 
     return False
+
 
 if __name__ == "__main__":
     get_acceptors_and_donors_command(sys.argv[1:])
