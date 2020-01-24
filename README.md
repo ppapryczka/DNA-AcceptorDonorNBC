@@ -11,5 +11,5 @@ Wymagania:
 Tworzenie środowskia:
 1. `python3.6 -m venv venv` (tworzy środowisko `venv`)
 2. `source venv/bin/activate` (aktywacja środowiska)
-3. `pip3 install --upgrade pip`
+3. `pip3 install --upgrade pip` (aktualizacja pip-a)
 4. `pip3 install -r requirements.txt` (instalacja bibliotek)
