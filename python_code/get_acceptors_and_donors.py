@@ -30,6 +30,9 @@ def parser_check_if_file_exists(parser: argparse.ArgumentParser, file_path: str)
     Args:
         parser: Command parser.
         file_path: Path to file.
+
+    Returns:
+        Original ``file_path`` when file exists
     """
     if os.path.isfile(file_path):
         return file_path
@@ -89,9 +92,24 @@ def get_acceptors_and_donors_command(command_args: List[str]) -> None:
         dna_sequences = dna_data_read(dna_file)
 
     # run get acceptors and donors
-    true_donor, false_donor, true_acceptor, false_acceptor = get_acceptors_and_donors(args.A, args.B, dna_sequences)
+    true_donor, false_donor, true_acceptor, false_acceptor = get_acceptors_and_donors(
+        args.A, args.B, dna_sequences
+    )
 
-    save_acceptor_and_donors_to_file(true_donor, false_donor, true_acceptor, false_acceptor, args.donors, args.acceptors)
+    for x in false_donor:
+        assert x[args.A : args.A + 2] == DONOR_SEQ
+
+    for x in false_acceptor:
+        assert x[args.A : args.A + 2] == ACCEPTOR_SEQ
+
+    save_acceptors_and_donors_to_file(
+        true_donor,
+        false_donor,
+        true_acceptor,
+        false_acceptor,
+        args.donors,
+        args.acceptors,
+    )
 
 
 def dna_data_read(file) -> List:
@@ -131,7 +149,9 @@ def dna_data_read(file) -> List:
     return dna_sequences
 
 
-def get_acceptors_and_donors(a_len: int, b_len: int, dna_sequences: List) -> Tuple[List, List, List, List]:
+def get_acceptors_and_donors(
+    a_len: int, b_len: int, dna_sequences: List
+) -> Tuple[List, List, List, List]:
     """
     Read data from ``input_file``, get false and real donors and save them to``donors_output``, get false
     and real acceptors and save them to ``acceptors_output``.
@@ -142,7 +162,8 @@ def get_acceptors_and_donors(a_len: int, b_len: int, dna_sequences: List) -> Tup
         dna_sequences: Sequences read from data file, each element of list is map which
         contains "Introns", "Exons", "Data".
 
-
+    Returns:
+        True donors, false donors, true acceptors, false acceptors lists.
     """
     # get donors
     true_donors: List = []
@@ -150,7 +171,9 @@ def get_acceptors_and_donors(a_len: int, b_len: int, dna_sequences: List) -> Tup
     for dna_sequence in dna_sequences:
         introns_begin_list = [x[0] for x in dna_sequence["Introns"]]
         true_donors.extend(
-            get_true_fragments(introns_begin_list, a_len, b_len, dna_sequence["Sequence"])
+            get_true_fragments(
+                introns_begin_list, a_len, b_len, dna_sequence["Sequence"]
+            )
         )
         false_donors.extend(
             get_false_fragments(
@@ -162,7 +185,8 @@ def get_acceptors_and_donors(a_len: int, b_len: int, dna_sequences: List) -> Tup
     true_acceptors: List = []
     false_acceptors: List = []
     for dna_sequence in dna_sequences:
-        introns_end_list = [x[1] for x in dna_sequence["Introns"]]
+        # IMPORTANT -1!!!
+        introns_end_list = [x[1] - 1 for x in dna_sequence["Introns"]]
         true_acceptors.extend(
             get_true_fragments(introns_end_list, a_len, b_len, dna_sequence["Sequence"])
         )
@@ -175,20 +199,35 @@ def get_acceptors_and_donors(a_len: int, b_len: int, dna_sequences: List) -> Tup
     return true_donors, false_donors, true_acceptors, false_acceptors
 
 
-def save_acceptor_and_donors_to_file(
+def save_acceptors_and_donors_to_file(
     true_donors: List,
     false_donors: List,
     true_acceptors: List,
     false_acceptors: List,
     donors_output: str,
     acceptors_output: str,
-):
+) -> None:
+    """
+    Save acceptors and donor to given files.
+
+    Args:
+        true_donors: List of true donors.
+        false_donors: List of false donors.
+        true_acceptors: List of true acceptors.
+        false_acceptors: List of false acceptors.
+        donors_output: Name of donor output file.
+        acceptors_output: Name of acceptors output file.
+    """
+
+    # save donors
     with open(donors_output, "w") as donors_f:
         for x in true_donors:
+
             donors_f.write(f"{1}\n{x}\n")
         for x in false_donors:
             donors_f.write(f"{0}\n{x}\n")
 
+    # save acceptors
     with open(acceptors_output, "w") as acceptors_f:
         for x in true_acceptors:
             acceptors_f.write(f"{1}\n{x}\n")
@@ -201,29 +240,56 @@ def get_true_fragments(
 ):
     """
     Get real donors/acceptors from given ``sequence_data`` described by ``true_fragments_positions``.
+
+    Args:
+        true_positions_list: List of true positions of donors/acceptors.
+        a_len: Left length of donor/acceptor.
+        b_len: Right length of donor/acceptor.
+        sequence_data: DNA data.
+
+    Returns:
+        List of true fragments.
     """
     true_fragments = []
     for x in true_positions_list:
         if not is_fragment_outside_of_sequence(a_len, b_len, x, len(sequence_data)):
-            true_fragments.append(sequence_data[x - a_len: x + b_len])
+            true_fragments.append(sequence_data[x - a_len : x + b_len])
     return true_fragments
 
 
 def get_false_fragments(
-    true_fragments_positions: List[int], a_len: int, b_len: int, sequence_data: str, fragment: str
+    true_fragments_positions: List[int],
+    a_len: int,
+    b_len: int,
+    sequence_data: str,
+    fragment: str,
 ):
     """
     Get false donors/acceptors from given ``sequence_data`` which have ``fragment at position ``A``. 
     ``true_fragments_positions`` are use to omit real donors/acceptors.
+
+    Args:
+        true_fragments_positions: List of true positions of donors/acceptors.
+        a_len: Left length of donor/acceptor.
+        b_len: Right length of donor/acceptor.
+        sequence_data: DNA data.
+        fragment: Fragment searched in ``sequence_data`` - look ACCEPTOR_SEQ, DONOR_SEQ.
+
+    Returns:
+        List of false fragments.
     """
     false_fragments = []
     possible_false_fragments = [m.start() for m in re.finditer(fragment, sequence_data)]
     for false_fragment_pos in possible_false_fragments:
         if is_good_false_fragment(
-            true_fragments_positions, a_len, b_len, false_fragment_pos, len(sequence_data)
+            true_fragments_positions,
+            a_len,
+            b_len,
+            false_fragment_pos,
+            len(sequence_data),
         ):
             false_fragments.append(
-                sequence_data[false_fragment_pos - a_len: false_fragment_pos + b_len]
+                sequence_data[false_fragment_pos - a_len : false_fragment_pos + b_len]
             )
     return false_fragments
 
@@ -231,23 +297,37 @@ def get_false_fragments(
 def line_of_numbers_to_tuples(line: str) -> List[Tuple[int, int]]:
     """
     Convert line of number split be white signs to list of tuples.
-    
+
+    Args:
+        line: Line to split numbers from.
+
     Returns:
         List of tuples. 
     """
     result = []
-    number_splited = line.split()
+    number_split = line.split()
 
-    number_iter = iter(number_splited)
+    number_iter = iter(number_split)
     for x in number_iter:
         result.append((int(x), int(next(number_iter))))
 
     return result
 
 
-def is_fragment_outside_of_sequence(a_len: int, b_len: int, pos: int, seq_len: int) -> bool:
+def is_fragment_outside_of_sequence(
+    a_len: int, b_len: int, pos: int, seq_len: int
+) -> bool:
     """
     Check if pos give a valid fragment which not go outside sequence.
+
+    Args:
+        a_len: Left length of donor/acceptor.
+        b_len: Right length od donor/acceptor.
+        pos: position to check.
+        seq_len: Length of original DNA sequence.
+
+    Returns:
+        True if fragment goes outside sequence, false if is correct.
     """
     if pos + a_len >= seq_len:
         return True
@@ -263,6 +343,16 @@ def is_good_false_fragment(
     """
     Check if fragment given by ``pos`` is not outside sequence and don't overlap any of true donors/acceptors
     mentioned in ``true_positions_list``.
+
+    Args:
+        true_positions_list: List of true positions of donors/acceptors.
+        a_len: Left length of donor/acceptor.
+        b_len: Right length od donor/acceptor.
+        pos: Position to check.
+        seq_len: Length of original DNA sequence.
+
+    Returns:
+        True if fragment is 'good'(don't overlap true fragment and don't goes outside sequence), false instead.
     """
     if is_fragment_outside_of_sequence(a_len, b_len, pos, seq_len):
         return False
@@ -278,7 +368,16 @@ def have_collision_with_true_fragment(
 ) -> bool:
     """
     Check if false fragment given by it ``position`` don't have overlapping with given 
-    true fragments in ``introns_list``.
+    true fragments in ``true_positions_list``.
+
+    Args:
+        true_positions_list: List of true positions of donors/acceptors.
+        a_len: Left length of donor/acceptor.
+        b_len: Right length od donor/acceptor.
+        pos: Position to check.
+
+    Returns:
+        True if fragment have collision with true fragment, false if don;t have collision.
     """
     for true_pos in true_positions_list:
         if true_pos - a_len <= pos - a_len <= true_pos + b_len:
