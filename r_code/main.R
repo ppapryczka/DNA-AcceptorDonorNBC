@@ -1,6 +1,6 @@
-# modules - to split code
-if (! "modules" %in% row.names(installed.packages()))
-  install.packages("modules")
-library(modules)
+#
+# Główny skrypt do przeprowadzania eksperymentów
+# Autorzy: Patryk Pankiewicz, Łukasz Brzezicki
 
-lib <- modules::use("R")
+source("utils.R")
+source("donor_acceptors_NCB.R")
