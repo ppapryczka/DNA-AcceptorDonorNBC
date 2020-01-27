@@ -1,3 +1,10 @@
+# Narzędzia do wczytywania i przetwarzania sekwencji DNA na atrybuty.
+# Autorzy: Patryk Pankiewicz, Łukasz Brzezicki
+
+# ---------------------------------------------------------------------------------------------
+# LOAD PACKAGES 
+# ---------------------------------------------------------------------------------------------
+
 # purrr - map functions
 if (! "purrr" %in% row.names(installed.packages()))
   install.packages("purrr")
@@ -23,6 +30,10 @@ nucleotide_to_number <- function(nucleotide){
     return(-1)
   }
 }
+
+# ---------------------------------------------------------------------------------------------
+# FUNCTIONS 
+# ---------------------------------------------------------------------------------------------
 
 sequence_to_numbers <- function(sequence){
   return (map_dbl(unlist(strsplit(sequence,""), use.names=FALSE), nucleotide_to_number))

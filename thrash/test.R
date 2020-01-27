@@ -1,4 +1,5 @@
-#!/usr/bin/env Rscript
-args = commandArgs(trailingOnly=TRUE)
+args <- commandArgs(trailingOnly = TRUE)
+x <- as.integer(args[1])
+y <- as.integer(args[2])
 
-print(args)
+cat(x, y)
