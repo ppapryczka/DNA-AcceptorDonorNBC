@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 TEST_DATA: str = \
 """
@@ -12,9 +12,39 @@ Data
 TTTTGTCAGCACATACGTAGCGAGTTCAGATGTGCT
 """
 
+TEST_A: int = 3
+TEST_B: int = 4
+
 SEQ_FROM_TEST_DATA: Dict = \
 {
     "Introns":[(4, 28)],
     "Exons": [(0, 3), (29, 36)],
     "Sequence" : "TTTTGTCAGCACATACGTAGCGAGTTCAGATGTGCT"
 }
+
+EXPECTED_TRUE_DONORS: List = [
+    "TTTGTCA"
+]
+
+NO_OVERLAP_EXPECTED_FALSE_DONORS: List = [
+    "TACGTAG",
+    "CGAGTTC",
+    "GATGTGC"
+]
+
+OVERLAP_EXPECTED_FALSE_DONORS: List = NO_OVERLAP_EXPECTED_FALSE_DONORS
+
+EXPECTED_TRUE_ACCEPTORS: List = [
+    "TTCAGAT"
+]
+
+NO_OVERLAP_EXPECTED_FALSE_ACCEPTORS: List = [
+    "GTCAGCA",
+    "CGTAGCG"
+]
+
+OVERLAP_EXPECTED_FALSE_ACCEPTORS: List = [
+    "GTCAGCA",
+    "CGTAGCG",
+    "GCGAGTT",
+]

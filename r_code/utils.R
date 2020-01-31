@@ -10,6 +10,14 @@ if (! "purrr" %in% row.names(installed.packages()))
   install.packages("purrr")
 library(purrr)
 
+
+# ---------------------------------------------------------------------------------------------
+# FUNCTIONS 
+# ---------------------------------------------------------------------------------------------
+
+#' Convert given nucleotide to number A=1, C=2, G=3, T=4.
+#' @param nucleotide Nucleotide to convert
+#' @return Code of nucleotide.
 nucleotide_to_number <- function(nucleotide){
   if (nucleotide == "A"){
     return(1)
@@ -31,14 +39,16 @@ nucleotide_to_number <- function(nucleotide){
   }
 }
 
-# ---------------------------------------------------------------------------------------------
-# FUNCTIONS 
-# ---------------------------------------------------------------------------------------------
-
+#' Convert sequence of nucleotides to matix of numbers
+#' @param sequence Sequence of nucleotides to convert
+#' @return Matrix of codes of nucelotides.
 sequence_to_numbers <- function(sequence){
-  return (map_dbl(unlist(strsplit(sequence,""), use.names=FALSE), nucleotide_to_number))
+  return (map_dbl(unlist(strsplit(toString(sequence),""), use.names=FALSE), nucleotide_to_number))
 }
 
+#' Convert nucleotide to hot-one-enconding.
+#' @param nucleotide Nucleotide to convert
+#' @return Hot-one-encoding list got nucelotidee.
 nucleotide_to_hoe <- function(nucleotide){
   if (nucleotide == "A"){
     return( c(1, 0, 0, 0))
@@ -60,11 +70,16 @@ nucleotide_to_hoe <- function(nucleotide){
   }
 }
 
+#' Convert sequence of nucleotides to matix of numbers
+#' @param sequence Sequence of nucleotides to convert
+#' @return Matrix of codes of nucelotides.
 sequence_to_hoe <- function(sequence){
   return (unlist(map(unlist(strsplit(sequence,""), use.names=FALSE), nucleotide_to_hoe)))
 }
 
-
+#' Load data from given file and sonvert sequences from file using one-hot-encoding.
+#' @param file_name Path to file name.
+#' @return Dataframe with sequences coded in one_hot_encoding.
 get_dataframe_from_sequences_dataframe_hoe <- function(file_name){
   data_table <- read.table(file_name)
   
@@ -81,6 +96,9 @@ get_dataframe_from_sequences_dataframe_hoe <- function(file_name){
   return(data_df)
 }
 
+#' Load data from given file and sonvert sequences from file using one-hot-encoding.
+#' @param file_name Path to file name.
+#' @return Dataframe with sequences coded in one_hot_encoding.
 get_dataframe_from_sequences_dataframe_num <- function(file_name){
   data_table <- read.table(file_name)
   

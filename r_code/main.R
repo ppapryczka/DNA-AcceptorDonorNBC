@@ -13,7 +13,7 @@ if (length(args) < 3){
   quit(save = "no", status = 0)
 }
 
-if (!identical(args[3], "sv") && !identical(args[3], "sv")){
+if (!identical(args[3], "sv") && !identical(args[3], "cv")){
   cat("Wrong validation method given!\n")
   cat("Validation metods:  'sv' - simple validation, 'cv'- cross validation\n.")
   quit(save = "no", status = 0)
@@ -27,17 +27,15 @@ source("donors_acceptors_NCB.R")
 
 if(identical(args[3], "sv")){
   df = get_dataframe_from_sequences_dataframe_num(args[1])
-}
-
-
-if(identical(args[3], "sv")){
-  df = get_dataframe_from_sequences_dataframe_num(args[1])
+  print(summary(df))
   train_test_validation_nb(df, report_path = args[2])  
 }
 
 if(identical(args[3], "cv")){
   df = get_dataframe_from_sequences_dataframe_num(args[1])
+  print(summary(df))
   cross_validation(df, report_path = args[2])
 }
 
 quit(save = "no", status = 0)
+  

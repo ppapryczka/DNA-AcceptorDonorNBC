@@ -120,8 +120,6 @@ def get_acceptors_and_donors_command(command_args: List[str]) -> None:
     # parse arguments
     args = parser.parse_args(command_args)
 
-    print(args)
-
     # read sequences
     with open(args.input) as dna_file:
         dna_sequences = dna_data_read(dna_file)
@@ -193,6 +191,7 @@ def get_acceptors(
     true_acceptors: List = []
     false_acceptors: List = []
     for dna_sequence in dna_sequences:
+
         # IMPORTANT -1!!!
         introns_end_list = [x[1] - 1 for x in dna_sequence["Introns"]]
         true_acceptors.extend(
@@ -226,7 +225,7 @@ def get_donors(
     # get donors
     true_donors: List = []
     false_donors: List = []
-    for dna_sequence in dna_sequences:
+    for id, dna_sequence in enumerate(dna_sequences):
         introns_begin_list = [x[0] for x in dna_sequence["Introns"]]
         true_donors.extend(
             get_true_fragments(
@@ -255,12 +254,13 @@ def save_sequences_to_file(
         false_seq: List of false donors/acceptors.
         output: Output file name.
     """
-    with open(output, "w") as donors_f:
+    with open(output, "w") as seq_f:
         for x in true_seq:
-            donors_f.write(f"{1}\n{x}\n")
+            if x != "":
+                seq_f.write(f"{1}\n{x}\n")
         for x in false_seq:
-            donors_f.write(f"{0}\n{x}\n")
-
+            if x != "":
+                seq_f.write(f"{0}\n{x}\n")
 
 def get_true_fragments(
     true_positions_list: List[int], a_len: int, b_len: int, sequence_data: str
@@ -309,6 +309,7 @@ def get_false_fragments(
     """
     false_fragments = []
     possible_false_fragments = [m.start() for m in re.finditer(fragment, sequence_data)]
+
     for false_fragment_pos in possible_false_fragments:
         if is_good_false_fragment(
             true_fragments_positions,

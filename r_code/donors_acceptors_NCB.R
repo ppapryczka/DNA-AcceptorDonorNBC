@@ -1,5 +1,5 @@
-#!/usr/bin/env Rscript
-args = commandArgs(trailingOnly=TRUE)
+# Funkcje do klasyfiakcji i generowania raportów.
+# Autorzy: Patryk Pankiewicz, Łukasz Brzezicki
 
 # ---------------------------------------------------------------------------------------------
 # LOAD PACKAGES 
@@ -31,15 +31,19 @@ if (! "precrec" %in% row.names(installed.packages()))
 library(precrec)
 
 
-default_donors <- "donor.dat"
-default_acceptors <- "acceptor.dat"
-
 source("utils.R")
 
 # ---------------------------------------------------------------------------------------------
 # FUNCTIONS 
 # ---------------------------------------------------------------------------------------------
 
+#' Create raport files from given classification results.
+#' @param pred_class Table with class predictions
+#' @param pred_raw Table with predictions probability.
+#' @param true_class Table with true class.
+#' @param report_path Path to report directory.
+#' @param prefix Prefix to report files.
+#' @return None.
 create_report_file <- function(pred_class, pred_raw, true_class, report_path, prefix =""){
   # save roc curve and pr curve
   plot_path = file.path(report_path, paste(prefix, "plot.png", sep = "_"))
@@ -63,6 +67,11 @@ create_report_file <- function(pred_class, pred_raw, true_class, report_path, pr
   sink()
 }
 
+#' Split data to test and validation sets and run naive bayes classifier.  
+#' @param df Datframe with nucleotides data.
+#' @param split_prop Proportion of test and validation sets.
+#' @param report_path Path to report directory.
+#' @return None
 train_test_validation_nb <- function(df, split_prop = 0.5, report_path ="."){
   # get only features names
   features <- setdiff(names(df), "class")
@@ -89,6 +98,11 @@ train_test_validation_nb <- function(df, split_prop = 0.5, report_path ="."){
   create_report_file(pred_class, pred_raw, test_class, report_path, "nb")
 }
 
+#' Split data to test and validation sets and run random forest classifier.  
+#' @param df Datframe with nucleotides data.
+#' @param split_prop Proportion of test and validation sets.
+#' @param report_path Path to report directory.
+#' @return None.
 train_test_validation_rf <- function(df, split_prop = 0.5, report_path ="."){
   # get only features names
   features <- setdiff(names(df), "class")
@@ -115,6 +129,12 @@ train_test_validation_rf <- function(df, split_prop = 0.5, report_path ="."){
   create_report_file(pred_class, pred_raw, test_class, report_path, "rf")
 }
 
+#' Run cross validation on given classification method.
+#' @param df Datframe with nucleotides data.
+#' @param report_path Path to report directory.
+#' @param method Classification method as string exmaple nb - naive bayes, rf - random forest.
+#' @param cv_num Cross-validation splits number. 
+#' @return None.
 cross_validation <- function(df, report_path =".", method = "nb", cv_num = 10){
   features <- setdiff(names(df), "class")
   
