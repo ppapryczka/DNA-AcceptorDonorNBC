@@ -10,13 +10,13 @@ report_dir=$report_dir`date +"%Y_%m_%d_%H_%M_%S"`
 data="data/araclean.dat"
 
 #result file 
-seq="donor.dat"
+seq="acceptor.dat"
 
 # A length
-A=50
+A=190
 
 # B length
-B=5
+B=190
 
 # type
 type="ACCEPTOR"
@@ -34,7 +34,7 @@ echo "Running data generation ..."
 
 python "python_code/get_acceptors_and_donors.py" $overlap -A $A -B $B -i $data -t $type -r $seq
  
-echo "Creating report folder: $date_time ..."
+echo "Creating report folder: $report_dir ..."
 mkdir $report_dir
 
 cd "./r_code"
